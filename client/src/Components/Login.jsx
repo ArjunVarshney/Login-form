@@ -95,7 +95,7 @@ const Login = (props) => {
           </Grid>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 8, mb: 4 }} />
+      <Copyright sx={{ mb: 5, mt: 3 }} />
     </CustomContainer>
   );
 };

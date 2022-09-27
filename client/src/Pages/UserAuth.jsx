@@ -9,7 +9,7 @@ const UserAuth = () => {
 
   return (
     <Box>
-      {auth == "login" ? (
+      {auth === "login" ? (
         <Login setAuth={setAuth} />
       ) : (
         <SignUp setAuth={setAuth} />

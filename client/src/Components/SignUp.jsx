@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import {
   Avatar,
   Button,
@@ -12,21 +13,52 @@ import {
   Container,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { API } from "../service/api";
 import Copyright from "./Copyright";
 
 const SignUp = (props) => {
-  const handleSubmit = (event) => {
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+
+    const firstName = data.get("firstName");
+    const lastName = data.get("lastName");
+    const email = data.get("email");
+    const password = data.get("password");
+
+    if (
+      firstName !== "" &&
+      lastName !== "" &&
+      email !== "" &&
+      password !== ""
+    ) {
+      const response = await API.userSignup({
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+
+      if (response.isSuccess) {
+        props.setAuth("login");
+      } else {
+        setError("Something went wrong! Please try again later");
+      }
+    } else {
+      setError("Please fill all the required fields!");
+    }
   };
 
   const CustomContainer = styled(Container)`
     border: 1px solid rgb(0 0 0/0.1);
-    margin-top: 50px;
+    margin-top: 20px;
+  `;
+
+  const ErrorTypo = styled(Typography)`
+    color: red;
+    margin-top: 10px;
   `;
 
   return (
@@ -43,6 +75,7 @@ const SignUp = (props) => {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
+        <ErrorTypo>{error}</ErrorTypo>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -115,7 +148,7 @@ const SignUp = (props) => {
           </Grid>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 5 }} />
+      <Copyright sx={{ mb: 5, mt: 3 }} />
     </CustomContainer>
   );
 };
