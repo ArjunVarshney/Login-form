@@ -13,15 +13,36 @@ import {
 } from "@mui/material";
 import Copyright from "./Copyright";
 import { styled } from "@mui/material/styles";
+import { API } from "../service/api";
+import { LoginData } from "../context/LoginContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = (props) => {
-  const handleSubmit = (event) => {
+  const { setAccount } = React.useContext(LoginData);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
+    const email = data.get("email");
+    const password = data.get("password");
+    const response = await API.userLogin({
+      email,
+      password,
     });
+    if (response.isSuccess) {
+      sessionStorage.setItem(
+        "accessToken",
+        `Bearer ${response.data.accessToken}`
+      );
+      sessionStorage.setItem(
+        "refreshToken",
+        `Bearer ${response.data.refreshToken}`
+      );
+      setAccount({ name: response.data.name, id: response.data.id });
+      console.log("success");
+      navigate("/home");
+    }
   };
 
   const CustomContainer = styled(Container)`
