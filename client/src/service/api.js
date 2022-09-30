@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
 );
 
 const processResponse = (response) => {
-  if (response?.status === 200) {
+  if (response?.status === 201 || response?.status === 200) {
     return { isSuccess: true, data: response.data };
   } else {
     return {
@@ -78,6 +78,7 @@ for (const [key, value] of Object.entries(SERVICE_URLS)) {
       method: value.method,
       url: value.url,
       data: body,
+      headers: value.headers,
       responseType: value.responseType,
       onUploadProgress: function (progressEvent) {
         if (showUploadProgress) {

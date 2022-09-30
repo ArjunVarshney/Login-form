@@ -16,6 +16,7 @@ import { styled } from "@mui/material/styles";
 import { API } from "../service/api";
 import { LoginData } from "../context/LoginContext";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Login = (props) => {
   const { setAccount } = React.useContext(LoginData);
@@ -31,19 +32,28 @@ const Login = (props) => {
       password,
     });
     if (response.isSuccess) {
-      sessionStorage.setItem(
-        "accessToken",
-        `Bearer ${response.data.accessToken}`
-      );
-      sessionStorage.setItem(
-        "refreshToken",
-        `Bearer ${response.data.refreshToken}`
-      );
+      localStorage.setItem("token", response.data.token);
       setAccount({ name: response.data.name, id: response.data.id });
-      console.log("success");
+      props.setAuth(true);
       navigate("/home");
     }
   };
+
+  const checkToken = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const response = await API.userAutoLogin();
+      if (response.isSuccess) {
+        setAccount({ name: response.data.name, id: response.data.id });
+        props.setAuth(true);
+        navigate("/home");
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkToken();
+  }, []);
 
   const CustomContainer = styled(Container)`
     border: 1px solid rgb(0 0 0/0.1);
@@ -105,11 +115,7 @@ const Login = (props) => {
               </Link>
             </Grid>
             <Grid item>
-              <Link
-                href="#"
-                variant="body2"
-                onClick={() => props.setAuth("signup")}
-              >
+              <Link href="/signup" variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

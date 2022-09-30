@@ -15,10 +15,11 @@ import {
 import { styled } from "@mui/material/styles";
 import { API } from "../service/api";
 import Copyright from "./Copyright";
+import { useNavigate } from "react-router-dom";
 
-const SignUp = (props) => {
+const SignUp = () => {
   const [error, setError] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -42,7 +43,8 @@ const SignUp = (props) => {
       });
 
       if (response.isSuccess) {
-        props.setAuth("login");
+        localStorage.setItem("token",response.data.token);
+        navigate("/login");
       } else {
         setError("Something went wrong! Please try again later");
       }
@@ -137,11 +139,7 @@ const SignUp = (props) => {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link
-                href="#"
-                variant="body2"
-                onClick={() => props.setAuth("login")}
-              >
+              <Link href="/login" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>

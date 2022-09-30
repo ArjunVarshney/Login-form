@@ -1,10 +1,17 @@
 import User from "../model/user.js";
+import Token from "../model/token.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import Token from "../model/token.js";
+import token from "../model/token.js";
 
 dotenv.config();
+
+const genToken = (id) => {
+  return jwt.sign({ id }, process.env.TOKEN_SECRET_KEY, {
+    expiresIn: "30s",
+  });
+};
 
 export const signUpUser = async (req, res) => {
   try {
@@ -17,10 +24,42 @@ export const signUpUser = async (req, res) => {
       email: user.email,
       password: hashPassword,
     });
-    await newUser.save();
-    res.status(200).json({ msg: "Sign-Up successfull" });
+    const newData = await newUser.save();
+    const token = new Token({ token: genToken(newData.id) });
+    await token.save();
+    res.status(201).json({
+      firstName: newData.firstName,
+      lastName: newData.lastName,
+      email: newData.email,
+      id: newData.id,
+      token: token.token,
+    });
   } catch (err) {
-    res.status(400).json({ msg: "An error occurred while signing you up" });
+    res
+      .status(400)
+      .json({ msg: "An error occurred while signing you up", err });
+  }
+};
+
+export const autoLogin = async (req, res) => {
+  try {
+    var decoded = jwt.verify(
+      req.headers.authorization,
+      process.env.TOKEN_SECRET_KEY
+    );
+    if (decoded) {
+      const user = await User.findOne({ _id: decoded.id });
+      return res.status(200).json({
+        name: user.firstName,
+        id: user.id,
+      });
+    }
+  } catch (error) {
+    await token.deleteOne({ token: req.headers.authorization });
+    return res.status(400).json({
+      msg: "Token expired",
+      error,
+    });
   }
 };
 
@@ -35,23 +74,12 @@ export const loginUser = async (req, res) => {
   try {
     const match = await bcrypt.compare(loginCred.password, user.password);
     if (match) {
-      const accessToken = jwt.sign(
-        user.toJSON(),
-        process.env.ACCESS_SECRET_KEY,
-        { expiresIn: "15m" }
-      );
-      const refreshToken = jwt.sign(
-        user.toJSON(),
-        process.env.REFRESH_SECRET_KEY
-      );
-      const newToken = new Token({ token: refreshToken });
+      const newToken = new Token({ token: genToken(user.id) });
       await newToken.save();
-
       return res.status(200).json({
-        accessToken,
-        refreshToken,
         name: user.firstName,
         id: user.id,
+        token: newToken.token,
       });
     } else {
       return res.status(400).json({
