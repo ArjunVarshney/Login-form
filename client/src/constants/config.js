@@ -39,4 +39,8 @@ export const SERVICE_URLS = {
         : "",
     },
   },
+  deleteToken:{
+    url:"/logout",
+    method:"POST",
+  }
 };

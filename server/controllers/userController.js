@@ -89,3 +89,16 @@ export const loginUser = async (req, res) => {
     });
   }
 };
+
+export const logoutUser = async (req, res) => {
+  try {
+    await Token.deleteOne({ token: req.body.token });
+    res.status(200).json({
+      msg: "deleted",
+    });
+  } catch (error) {
+    res.status(400).json({
+      msg: "Some error occurred while logging out !!",
+    });
+  }
+};

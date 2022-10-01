@@ -11,8 +11,8 @@ import Login from "./Components/Login";
 import SignUp from "./Components/SignUp";
 import { useState } from "react";
 
-const PrivateRoute = ({ auth, ...props }) => {
-  return auth ? (
+const PrivateRoute = (props) => {
+  return props.auth ? (
     <>
       <Outlet />
     </>
@@ -30,9 +30,9 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login setAuth={setAuth} />} />
           <Route path="/signup" element={<SignUp />} />
-          {/* <Route path="/" element={<PrivateRoute auth={auth} />}> */}
-            <Route path="*" element={<Home />} />
-          {/* </Route> */}
+          <Route path="/*" element={<PrivateRoute auth={auth} />}>
+            <Route path="*" element={<Home auth={auth} />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </LoginContext>
