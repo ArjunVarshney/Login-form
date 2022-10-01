@@ -35,7 +35,7 @@ const Login = (props) => {
       localStorage.setItem("token", response.data.token);
       setAccount({ name: response.data.name, id: response.data.id });
       props.setAuth(true);
-      navigate("/home");
+      navigate("/");
     }
   };
 
@@ -46,7 +46,7 @@ const Login = (props) => {
       if (response.isSuccess) {
         setAccount({ name: response.data.name, id: response.data.id });
         props.setAuth(true);
-        navigate("/home");
+        navigate("/");
       }
     }
   };

@@ -43,7 +43,6 @@ const SignUp = () => {
       });
 
       if (response.isSuccess) {
-        localStorage.setItem("token",response.data.token);
         navigate("/login");
       } else {
         setError("Something went wrong! Please try again later");

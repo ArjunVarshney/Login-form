@@ -9,7 +9,7 @@ dotenv.config();
 
 const genToken = (id) => {
   return jwt.sign({ id }, process.env.TOKEN_SECRET_KEY, {
-    expiresIn: "30s",
+    expiresIn: "30d",
   });
 };
 
@@ -25,14 +25,11 @@ export const signUpUser = async (req, res) => {
       password: hashPassword,
     });
     const newData = await newUser.save();
-    const token = new Token({ token: genToken(newData.id) });
-    await token.save();
     res.status(201).json({
       firstName: newData.firstName,
       lastName: newData.lastName,
       email: newData.email,
       id: newData.id,
-      token: token.token,
     });
   } catch (err) {
     res
